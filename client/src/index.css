@@ -1,0 +1,137 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: hsl(0, 0%, 100%);
+  --foreground: hsl(240, 10%, 3.9%);
+  --muted: hsl(240, 4.8%, 95.9%);
+  --muted-foreground: hsl(240, 3.7%, 44.1%);
+  --popover: hsl(0, 0%, 100%);
+  --popover-foreground: hsl(240, 10%, 3.9%);
+  --card: hsl(0, 0%, 100%);
+  --card-foreground: hsl(240, 10%, 3.9%);
+  --border: hsl(240, 5.9%, 90%);
+  --input: hsl(240, 5.9%, 90%);
+  --primary: hsl(262.1, 83.3%, 57.8%);
+  --primary-foreground: hsl(210, 20%, 98%);
+  --secondary: hsl(220, 14.3%, 95.9%);
+  --secondary-foreground: hsl(220.9, 39.3%, 11%);
+  --accent: hsl(220, 14.3%, 95.9%);
+  --accent-foreground: hsl(220.9, 39.3%, 11%);
+  --destructive: hsl(0, 84.2%, 60.2%);
+  --destructive-foreground: hsl(210, 20%, 98%);
+  --ring: hsl(262.1, 83.3%, 57.8%);
+  --radius: 0.5rem;
+  --chart-1: hsl(12, 76%, 61%);
+  --chart-2: hsl(173, 58%, 39%);
+  --chart-3: hsl(197, 37%, 24%);
+  --chart-4: hsl(43, 74%, 66%);
+  --chart-5: hsl(27, 87%, 67%);
+}
+
+.dark {
+  --background: hsl(224, 71.4%, 4.1%);
+  --foreground: hsl(210, 20%, 98%);
+  --muted: hsl(215, 27.9%, 16.9%);
+  --muted-foreground: hsl(217.9, 10.6%, 64.9%);
+  --popover: hsl(224, 71.4%, 4.1%);
+  --popover-foreground: hsl(210, 20%, 98%);
+  --card: hsl(224, 71.4%, 4.1%);
+  --card-foreground: hsl(210, 20%, 98%);
+  --border: hsl(215, 27.9%, 16.9%);
+  --input: hsl(215, 27.9%, 16.9%);
+  --primary: hsl(263.4, 70%, 50.4%);
+  --primary-foreground: hsl(210, 20%, 98%);
+  --secondary: hsl(215, 27.9%, 16.9%);
+  --secondary-foreground: hsl(210, 20%, 98%);
+  --accent: hsl(215, 27.9%, 16.9%);
+  --accent-foreground: hsl(210, 20%, 98%);
+  --destructive: hsl(0, 62.8%, 30.6%);
+  --destructive-foreground: hsl(210, 20%, 98%);
+  --ring: hsl(263.4, 70%, 50.4%);
+  --chart-1: hsl(220, 70%, 50%);
+  --chart-2: hsl(160, 60%, 45%);
+  --chart-3: hsl(30, 80%, 55%);
+  --chart-4: hsl(280, 65%, 60%);
+  --chart-5: hsl(340, 75%, 55%);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    background: hsl(224, 71.4%, 4.1%);
+    color: hsl(210, 20%, 98%);
+  }
+
+  /* Custom StreamSeen colors */
+  .bg-streamseen-50 { background-color: hsl(238, 100%, 97%); }
+  .bg-streamseen-100 { background-color: hsl(240, 100%, 95%); }
+  .bg-streamseen-200 { background-color: hsl(241, 95%, 87%); }
+  .bg-streamseen-300 { background-color: hsl(242, 89%, 78%); }
+  .bg-streamseen-400 { background-color: hsl(243, 81%, 68%); }
+  .bg-streamseen-500 { background-color: hsl(243, 75%, 59%); }
+  .bg-streamseen-600 { background-color: hsl(245, 79%, 52%); }
+  .bg-streamseen-700 { background-color: hsl(247, 78%, 46%); }
+  .bg-streamseen-800 { background-color: hsl(249, 69%, 41%); }
+  .bg-streamseen-900 { background-color: hsl(251, 64%, 36%); }
+
+  .text-streamseen-50 { color: hsl(238, 100%, 97%); }
+  .text-streamseen-100 { color: hsl(240, 100%, 95%); }
+  .text-streamseen-200 { color: hsl(241, 95%, 87%); }
+  .text-streamseen-300 { color: hsl(242, 89%, 78%); }
+  .text-streamseen-400 { color: hsl(243, 81%, 68%); }
+  .text-streamseen-500 { color: hsl(243, 75%, 59%); }
+  .text-streamseen-600 { color: hsl(245, 79%, 52%); }
+  .text-streamseen-700 { color: hsl(247, 78%, 46%); }
+  .text-streamseen-800 { color: hsl(249, 69%, 41%); }
+  .text-streamseen-900 { color: hsl(251, 64%, 36%); }
+
+  /* Animation utilities */
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease-in-out;
+  }
+
+  .animate-slide-up {
+    animation: slideUp 0.3s ease-out;
+  }
+
+  .animate-pulse-subtle {
+    animation: pulseSubtle 2s infinite;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes slideUp {
+    from {
+      transform: translateY(20px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes pulseSubtle {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.8;
+    }
+  }
+}
