@@ -486,15 +486,32 @@ export class DatabaseStorage implements IStorage {
       ...receivedRequests.map(f => f.userId),
     ];
 
-    const suggested = await db
-      .select()
-      .from(users)
-      .where(and(
-        sql`${users.id} != ALL(${excludeIds})`,
-        eq(users.publicProfile, true),
-        eq(users.friendRecommendations, true)
-      ))
-      .limit(10);
+    // For now, use a simpler approach without complex array operations
+    let suggested;
+    if (excludeIds.length <= 1) {
+      suggested = await db
+        .select()
+        .from(users)
+        .where(and(
+          ne(users.id, userId),
+          eq(users.publicProfile, true),
+          eq(users.friendRecommendations, true)
+        ))
+        .limit(10);
+    } else {
+      // Get all public users first, then filter in JavaScript
+      const allUsers = await db
+        .select()
+        .from(users)
+        .where(and(
+          eq(users.publicProfile, true),
+          eq(users.friendRecommendations, true)
+        ));
+      
+      suggested = allUsers
+        .filter(user => !excludeIds.includes(user.id))
+        .slice(0, 10);
+    }
 
     return suggested;
   }

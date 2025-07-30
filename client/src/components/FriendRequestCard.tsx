@@ -1,16 +1,17 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
+import { Card, CardContent } from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 import { isUnauthorizedError } from "@/lib/authUtils";
-import type { FriendRequest } from "@/types";
+import type { FriendRequestWithUser } from "@/types";
 
 interface FriendRequestCardProps {
-  request: FriendRequest;
-  compact?: boolean;
+  request: FriendRequestWithUser;
 }
 
-export default function FriendRequestCard({ request, compact = false }: FriendRequestCardProps) {
+export default function FriendRequestCard({ request }: FriendRequestCardProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -23,8 +24,8 @@ export default function FriendRequestCard({ request, compact = false }: FriendRe
       queryClient.invalidateQueries({ queryKey: ['/api/friends'] });
       queryClient.invalidateQueries({ queryKey: ['/api/users/stats'] });
       toast({
-        title: "Friend Request Accepted",
-        description: `You are now friends with ${request.friend.firstName || 'this user'}.`,
+        title: "Friend request accepted",
+        description: `You are now friends with ${request.user.firstName}`,
       });
     },
     onError: (error) => {
@@ -41,7 +42,7 @@ export default function FriendRequestCard({ request, compact = false }: FriendRe
       }
       toast({
         title: "Error",
-        description: "Failed to accept friend request. Please try again.",
+        description: "Failed to accept friend request",
         variant: "destructive",
       });
     },
@@ -54,8 +55,8 @@ export default function FriendRequestCard({ request, compact = false }: FriendRe
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/friends/requests'] });
       toast({
-        title: "Friend Request Declined",
-        description: "The friend request has been declined.",
+        title: "Friend request declined",
+        description: "Request has been declined",
       });
     },
     onError: (error) => {
@@ -72,66 +73,51 @@ export default function FriendRequestCard({ request, compact = false }: FriendRe
       }
       toast({
         title: "Error",
-        description: "Failed to decline friend request. Please try again.",
+        description: "Failed to decline friend request",
         variant: "destructive",
       });
     },
   });
 
-  const handleAccept = () => {
-    acceptMutation.mutate();
-  };
-
-  const handleDecline = () => {
-    declineMutation.mutate();
-  };
-
-  const profileImage = request.friend.profileImageUrl || 
-    'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&w=40&h=40';
-
   return (
-    <div className={`flex items-center justify-between p-3 bg-gray-700 rounded-lg ${compact ? '' : 'animate-fade-in'}`}>
-      <div className="flex items-center gap-3">
-        <img 
-          src={profileImage} 
-          alt={request.friend.firstName || 'User'} 
-          className={`${compact ? 'w-8 h-8' : 'w-10 h-10'} rounded-full object-cover`}
-        />
-        <div>
-          <p className={`font-medium text-white ${compact ? 'text-sm' : ''}`}>
-            {request.friend.showRealName && request.friend.firstName && request.friend.lastName 
-              ? `${request.friend.firstName} ${request.friend.lastName}` 
-              : request.friend.firstName || 'Anonymous User'
-            }
-          </p>
-          <p className={`text-gray-400 ${compact ? 'text-xs' : 'text-sm'}`}>
-            @{request.friend.email?.split('@')[0] || 'user'}
-          </p>
+    <Card className="bg-gray-700 border-gray-600">
+      <CardContent className="p-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Avatar className="h-10 w-10">
+              <AvatarImage src={request.user.profileImageUrl} />
+              <AvatarFallback className="bg-gray-600 text-white">
+                {request.user.firstName?.[0]}{request.user.lastName?.[0]}
+              </AvatarFallback>
+            </Avatar>
+            <div>
+              <p className="font-medium text-white">
+                {request.user.firstName} {request.user.lastName}
+              </p>
+              <p className="text-sm text-gray-400">Wants to be friends</p>
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <Button 
+              size="sm" 
+              onClick={() => acceptMutation.mutate()}
+              disabled={acceptMutation.isPending}
+              className="bg-green-600 hover:bg-green-700"
+            >
+              Accept
+            </Button>
+            <Button 
+              size="sm" 
+              variant="outline" 
+              onClick={() => declineMutation.mutate()}
+              disabled={declineMutation.isPending}
+              className="border-gray-600 text-gray-300 hover:bg-gray-600"
+            >
+              Decline
+            </Button>
+          </div>
         </div>
-      </div>
-      <div className="flex gap-2">
-        <Button 
-          size={compact ? "sm" : "default"}
-          onClick={handleAccept}
-          disabled={acceptMutation.isPending || declineMutation.isPending}
-          className={`bg-indigo-600 hover:bg-indigo-700 text-white font-medium transition-colors ${
-            compact ? 'text-xs px-2 py-1' : 'px-3 py-1 text-sm'
-          }`}
-        >
-          Accept
-        </Button>
-        <Button 
-          size={compact ? "sm" : "default"}
-          variant="secondary"
-          onClick={handleDecline}
-          disabled={acceptMutation.isPending || declineMutation.isPending}
-          className={`bg-gray-600 hover:bg-gray-500 text-white font-medium transition-colors ${
-            compact ? 'text-xs px-2 py-1' : 'px-3 py-1 text-sm'
-          }`}
-        >
-          Decline
-        </Button>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 }
