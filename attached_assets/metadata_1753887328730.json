@@ -1,0 +1,6 @@
+{
+  "name": "StreamSeen",
+  "description": "A one-stop shop to solve your movie night dilemmas. Get a single movie recommendation, find where any title is streaming, and calculate your subscription costs all in one place.",
+  "requestFramePermissions": [],
+  "prompt": ""
+}
