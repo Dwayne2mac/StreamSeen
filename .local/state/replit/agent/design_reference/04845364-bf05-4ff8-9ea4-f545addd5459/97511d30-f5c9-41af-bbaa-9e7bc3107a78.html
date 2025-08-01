@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StreamSeen - Social Movie & TV Discovery</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'streamseen': {
+                            50: '#EEF2FF',
+                            100: '#E0E7FF',
+                            200: '#C7D2FE',
+                            300: '#A5B4FC',
+                            400: '#818CF8',
+                            500: '#6366F1',
+                            600: '#4F46E5',
+                            700: '#4338CA',
+                            800: '#3730A3',
+                            900: '#312E81'
+                        }
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.3s ease-in-out',
+                        'slide-up': 'slideUp 0.3s ease-out',
+                        'pulse-subtle': 'pulseSubtle 2s infinite'
+                    }
+                }
+            }
+        };
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .fade-in { animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes pulseSubtle { 0%, 100% { opacity: 1; } 50% { opacity: 0.8; } }
+        .scroll-smooth { scroll-behavior: smooth; }
+    </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen">
+    <!-- Demo State Toggle -->
+    <div class="fixed top-4 right-4 z-50 bg-gray-800 rounded-lg p-2 border border-gray-700">
+        <select id="stateSelect" class="bg-gray-700 text-white text-xs rounded px-2 py-1 border-none outline-none">
+            <option value="dashboard">Dashboard (Logged In)</option>
+            <option value="login">Login Screen</option>
+            <option value="profile">User Profile</option>
+            <option value="friends">Friends Management</option>
+            <option value="discovery">Friend Discovery</option>
+            <option value="settings">Privacy Settings</option>
+        </select>
+    </div>
+
+    <!-- LOGIN STATE -->
+    <div id="login-state" class="hidden min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-streamseen-900 p-4">
+        <div class="max-w-md w-full">
+            <!-- Logo and Brand -->
+            <div class="text-center mb-8">
+                <div class="mx-auto w-16 h-16 bg-streamseen-600 rounded-2xl flex items-center justify-center mb-4">
+                    <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
+                        <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
+                    </svg>
+                </div>
+                <h1 class="text-3xl font-bold text-white">StreamSeen</h1>
+                <p class="text-gray-400 mt-2">Discover movies and shows with friends</p>
+            </div>
+
+            <!-- Login Card -->
+            <div class="bg-gray-800 rounded-xl shadow-2xl p-8 border border-gray-700">
+                <h2 class="text-2xl font-bold text-center mb-6">Welcome Back</h2>
+                
+                <!-- Auth Buttons -->
+                <div class="space-y-4">
+                    <button class="w-full bg-streamseen-600 hover:bg-streamseen-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 0C4.477 0 0 4.484 0 10.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0110 4.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.203 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.942.359.31.678.921.678 1.856 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0020 10.017C20 4.484 15.522 0 10 0z" clip-rule="evenodd"/>
+                        </svg>
+                        Continue with GitHub
+                    </button>
+                    
+                    <button class="w-full bg-gray-700 hover:bg-gray-600 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                        </svg>
+                        Continue with Google
+                    </button>
+                </div>
+
+                <div class="mt-6 text-center">
+                    <p class="text-gray-400 text-sm">
+                        By continuing, you agree to our Terms of Service and Privacy Policy
+                    </p>
+                </div>
+            </div>
+
+            <!-- Features Preview -->
+            <div class="mt-8 text-center">
+                <p class="text-gray-400 text-sm mb-4">Join thousands discovering their next favorite watch</p>
+                <div class="flex justify-center space-x-6 text-xs text-gray-500">
+                    <span>🎬 AI Recommendations</span>
+                    <span>👥 Friend Watchlists</span>
+                    <span>📺 Streaming Search</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN DASHBOARD STATE -->
+    <div id="dashboard-state" class="flex h-screen">
+        <!-- Sidebar Navigation -->
+        <aside class="w-64 bg-gray-800 border-r border-gray-700 flex flex-col">
+            <!-- Logo -->
+            <div class="p-6 border-b border-gray-700">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-streamseen-600 rounded-lg flex items-center justify-center">
+                        <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
+                            <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                    <span class="text-xl font-bold">StreamSeen</span>
+                </div>
+            </div>
+
+            <!-- User Profile Section -->
+            <div class="px-4 py-4 border-b border-gray-700">
+                <div class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-700 cursor-pointer transition-colors">
+                    <!-- Sample user profile image -->
+                    <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=32&h=32" alt="User Avatar" class="w-8 h-8 rounded-full object-cover"/>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-medium text-white truncate">Alex Thompson</p>
+                        <p class="text-xs text-gray-400 truncate">@alexthompson</p>
+                    </div>
+                    <div class="relative">
+                        <div class="w-2 h-2 bg-red-500 rounded-full animate-pulse-subtle"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation Menu -->
+            <nav class="flex-1 px-4 py-4 space-y-2">
+                <a href="#" class="nav-item active flex items-center gap-3 px-3 py-2 rounded-lg bg-streamseen-600 text-white">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5a2 2 0 012-2h4a2 2 0 012 2v6H8V5z"/>
+                    </svg>
+                    <span class="text-sm font-medium">Dashboard</span>
+                </a>
+                
+                <a href="#" class="nav-item flex items-center gap-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                    </svg>
+                    <span class="text-sm font-medium">Watch Tonight</span>
+                </a>
+                
+                <a href="#" class="nav-item flex items-center gap-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                    <span class="text-sm font-medium">Streaming Search</span>
+                </a>
+                
+                <a href="#" class="nav-item flex items-center gap-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/>
+                    </svg>
+                    <span class="text-sm font-medium">My Lists</span>
+                    <span class="ml-auto bg-gray-600 text-xs px-2 py-0.5 rounded-full">24</span>
+                </a>
+                
+                <a href="#" class="nav-item flex items-center gap-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white transition-colors relative">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/>
+                    </svg>
+                    <span class="text-sm font-medium">Friends</span>
+                    <div class="ml-auto flex items-center gap-1">
+                        <span class="bg-red-500 text-xs px-1.5 py-0.5 rounded-full">3</span>
+                    </div>
+                </a>
+            </nav>
+
+            <!-- Bottom Section -->
+            <div class="p-4 border-t border-gray-700 space-y-2">
+                <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    </svg>
+                    <span class="text-sm font-medium">Settings</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 overflow-y-auto">
+            <!-- Header -->
+            <header class="bg-gray-800 border-b border-gray-700 px-6 py-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h1 class="text-2xl font-bold text-white">Dashboard</h1>
+                        <p class="text-gray-400 text-sm">Welcome back, Alex! Here's what's happening.</p>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <!-- Friend Requests Notification -->
+                        <div class="relative">
+                            <button class="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded-lg transition-colors">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/>
+                                </svg>
+                            </button>
+                            <div class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">
+                                <span class="text-xs font-bold text-white">3</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Notifications -->
+                        <div class="relative">
+                            <button class="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded-lg transition-colors">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 19.5A2.5 2.5 0 016.5 17H20"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Content -->
+            <div class="p-6 space-y-6">
+                <!-- Quick Stats -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div class="bg-gray-800 rounded-xl p-4 border border-gray-700">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-400 text-sm">Watchlist</p>
+                                <p class="text-2xl font-bold text-white">24</p>
+                            </div>
+                            <div class="p-3 bg-streamseen-600 rounded-lg">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gray-800 rounded-xl p-4 border border-gray-700">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-400 text-sm">Watched</p>
+                                <p class="text-2xl font-bold text-white">156</p>
+                            </div>
+                            <div class="p-3 bg-green-600 rounded-lg">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gray-800 rounded-xl p-4 border border-gray-700">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-400 text-sm">Friends</p>
+                                <p class="text-2xl font-bold text-white">12</p>
+                            </div>
+                            <div class="p-3 bg-blue-600 rounded-lg">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gray-800 rounded-xl p-4 border border-gray-700">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-400 text-sm">This Month</p>
+                                <p class="text-2xl font-bold text-white">8</p>
+                            </div>
+                            <div class="p-3 bg-purple-600 rounded-lg">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2m-9 0h10m-10 0a2 2 0 00-2 2v14a2 2 0 002 2h8a2 2 0 002-2V6a2 2 0 00-2-2"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Friend Requests Section -->
+                <div class="bg-gray-800 rounded-xl p-6 border border-gray-700">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-xl font-bold text-white">Friend Requests</h2>
+                        <span class="bg-red-500 text-white text-xs px-2 py-1 rounded-full">3 pending</span>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between p-3 bg-gray-700 rounded-lg">
+                            <div class="flex items-center gap-3">
+                                <!-- Sample profile image showing a young woman with brown hair -->
+                                <img src="https://pixabay.com/get/g8af9fa2290a1f194db2ce13dc35fd33c289d685609b118d1213e74bfb6c7a726a148f4607253eba85472cea4a03060063f5d77f85c5aff8d214af8d370c0fedf_1280.jpg" alt="Sarah Chen" class="w-10 h-10 rounded-full object-cover"/>
+                                <div>
+                                    <p class="font-medium text-white">Sarah Chen</p>
+                                    <p class="text-sm text-gray-400">@sarahchen • 2 mutual friends</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-2">
+                                <button class="bg-streamseen-600 hover:bg-streamseen-700 text-white px-3 py-1 rounded text-sm font-medium transition-colors">Accept</button>
+                                <button class="bg-gray-600 hover:bg-gray-500 text-white px-3 py-1 rounded text-sm font-medium transition-colors">Decline</button>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center justify-between p-3 bg-gray-700 rounded-lg">
+                            <div class="flex items-center gap-3">
+                                <!-- Sample profile image showing a man with glasses and beard -->
+                                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=40&h=40" alt="Mike Johnson" class="w-10 h-10 rounded-full object-cover"/>
+                                <div>
+                                    <p class="font-medium text-white">Mike Johnson</p>
+                                    <p class="text-sm text-gray-400">@mikej • 1 mutual friend</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-2">
+                                <button class="bg-streamseen-600 hover:bg-streamseen-700 text-white px-3 py-1 rounded text-sm font-medium transition-colors">Accept</button>
+                                <button class="bg-gray-600 hover:bg-gray-500 text-white px-3 py-1 rounded text-sm font-medium transition-colors">Decline</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Friends' Activity -->
+                    <div class="bg-gray-800 rounded-xl p-6 border border-gray-700">
+                        <h2 class="text-xl font-bold text-white mb-4">Friends' Activity</h2>
+                        <div class="space-y-4">
+                            <div class="flex items-start gap-3">
+                                <!-- Sample profile image showing a woman with short dark hair -->
+                                <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=32&h=32" alt="Emma Wilson" class="w-8 h-8 rounded-full object-cover"/>
+                                <div class="min-w-0 flex-1">
+                                    <p class="text-sm text-gray-300">
+                                        <span class="font-medium text-white">Emma Wilson</span> watched 
+                                        <span class="font-medium text-streamseen-400">The Matrix</span> and rated it 5⭐
+                                    </p>
+                                    <p class="text-xs text-gray-500 mt-1">2 hours ago</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <!-- Sample profile image showing a man with short blonde hair -->
+                                <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=32&h=32" alt="David Kim" class="w-8 h-8 rounded-full object-cover"/>
+                                <div class="min-w-0 flex-1">
+                                    <p class="text-sm text-gray-300">
+                                        <span class="font-medium text-white">David Kim</span> added 
+                                        <span class="font-medium text-streamseen-400">Dune: Part Two</span> to watchlist
+                                    </p>
+                                    <p class="text-xs text-gray-500 mt-1">4 hours ago</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <!-- Sample profile image showing a woman with curly hair -->
+                                <img src="https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=32&h=32" alt="Lisa Garcia" class="w-8 h-8 rounded-full object-cover"/>
+                                <div class="min-w-0 flex-1">
+                                    <p class="text-sm text-gray-300">
+                                        <span class="font-medium text-white">Lisa Garcia</span> recommended 
+                                        <span class="font-medium text-streamseen-400">The Bear</span> to you
+                                    </p>
+                                    <p class="text-xs text-gray-500 mt-1">1 day ago</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="bg-gray-800 rounded-xl p-6 border border-gray-700">
+                        <h2 class="text-xl font-bold text-white mb-4">Quick Actions</h2>
+                        <div class="space-y-3">
+                            <button class="w-full bg-streamseen-600 hover:bg-streamseen-700 text-white p-3 rounded-lg text-left transition-colors">
+                                <div class="flex items-center gap-3">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                                    </svg>
+                                    <div>
+                                        <p class="font-medium">Get Tonight's Recommendation</p>
+                                        <p class="text-sm text-streamseen-200">AI-powered movie suggestions</p>
+                                    </div>
+                                </div>
+                            </button>
+                            
+                            <button class="w-full bg-gray-700 hover:bg-gray-600 text-white p-3 rounded-lg text-left transition-colors">
+                                <div class="flex items-center gap-3">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                                    </svg>
+                                    <div>
+                                        <p class="font-medium">Search Streaming Services</p>
+                                        <p class="text-sm text-gray-400">Find where to watch anything</p>
+                                    </div>
+                                </div>
+                            </button>
+                            
+                            <button class="w-full bg-gray-700 hover:bg-gray-600 text-white p-3 rounded-lg text-left transition-colors">
+                                <div class="flex items-center gap-3">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/>
+                                    </svg>
+                                    <div>
+                                        <p class="font-medium">Invite Friends</p>
+                                        <p class="text-sm text-gray-400">Share your watchlists</p>
+                                    </div>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- USER PROFILE STATE -->
+    <div id="profile-state" class="hidden min-h-screen bg-gray-900">
+        <div class="max-w-4xl mx-auto px-4 py-8">
+            <!-- Profile Header -->
+            <div class="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden mb-6">
+                <!-- Profile Banner -->
+                <div class="h-32 bg-gradient-to-r from-streamseen-600 to-purple-600"></div>
+                
+                <!-- Profile Info -->
+                <div class="px-6 pb-6">
+                    <div class="flex items-start gap-4 -mt-16">
+                        <!-- Sample user profile image -->
+                        <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=128&h=128" alt="Alex Thompson" class="w-32 h-32 rounded-2xl border-4 border-gray-800 object-cover"/>
+                        <div class="flex-1 mt-16">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h1 class="text-2xl font-bold text-white">Alex Thompson</h1>
+                                    <p class="text-gray-400">@alexthompson</p>
+                                    <p class="text-sm text-gray-500 mt-1">Joined March 2024</p>
+                                </div>
+                                <button class="bg-streamseen-600 hover:bg-streamseen-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                                    Edit Profile
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Bio -->
+                    <div class="mt-4">
+                        <p class="text-gray-300">Movie enthusiast and series binger. Always looking for the next great story to watch. 🎬✨</p>
+                    </div>
+                    
+                    <!-- Stats -->
+                    <div class="flex items-center gap-6 mt-4 text-sm">
+                        <div class="flex items-center gap-2">
+                            <span class="font-bold text-white">156</span>
+                            <span class="text-gray-400">Watched</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="font-bold text-white">24</span>
+                            <span class="text-gray-400">Watchlist</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="font-bold text-white">12</span>
+                            <span class="text-gray-400">Friends</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="font-bold text-white">4.2</span>
+                            <span class="text-gray-400">Avg Rating</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Content Tabs -->
+            <div class="bg-gray-800 rounded-xl border border-gray-700">
+                <div class="border-b border-gray-700">
+                    <nav class="flex">
+                        <button class="px-6 py-4 text-sm font-medium text-streamseen-400 border-b-2 border-streamseen-400">
+                            Recent Activity
+                        </button>
+                        <button class="px-6 py-4 text-sm font-medium text-gray-400 hover:text-white transition-colors">
+                            Favorite Genres
+                        </button>
+                        <button class="px-6 py-4 text-sm font-medium text-gray-400 hover:text-white transition-colors">
+                            Reviews
+                        </button>
+                    </nav>
+                </div>
+                
+                <div class="p-6">
+                    <!-- Recent Activity Content -->
+                    <div class="space-y-4">
+                        <div class="flex items-start gap-4 p-4 bg-gray-700 rounded-lg">
+                            <div class="w-12 h-12 bg-green-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-white font-medium">Watched The Matrix Resurrections</p>
+                                <p class="text-gray-400 text-sm">Rated 4⭐ • "A solid return to the Matrix universe"</p>
+                                <p class="text-gray-500 text-xs mt-1">2 hours ago</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start gap-4 p-4 bg-gray-700 rounded-lg">
+                            <div class="w-12 h-12 bg-streamseen-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/>
+                                </svg>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-white font-medium">Added Dune: Part Two to watchlist</p>
+                                <p class="text-gray-400 text-sm">Looking forward to the sequel!</p>
+                                <p class="text-gray-500 text-xs mt-1">1 day ago</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start gap-4 p-4 bg-gray-700 rounded-lg">
+                            <div class="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                                </svg>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-white font-medium">Connected with Sarah Chen</p>
+                                <p class="text-gray-400 text-sm">Now following each other's watchlists</p>
+                                <p class="text-gray-500 text-xs mt-1">2 days ago</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FRIENDS MANAGEMENT STATE -->
+    <div id="friends-state" class="hidden min-h-screen bg-gray-900">
+        <div class="max-w-6xl mx-auto px-4 py-8">
+            <div class="mb-8">
+                <h1 class="text-3xl font-bold text-white">Friends</h1>
+                <p class="text-gray-400 mt-2">Manage your connections and discover what friends are watching</p>
+            </div>
+
+            <!-- Friend Management Cards -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Friend Requests -->
+                <div class="bg-gray-800 rounded-xl border border-gray-700 p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-xl font-bold text-white">Requests</h2>
+                        <span class="bg-red-500 text-white text-xs px-2 py-1 rounded-full">3</span>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="p-3 bg-gray-700 rounded-lg">
+                            <div class="flex items-center gap-3 mb-2">
+                                <!-- Sample profile image showing a young woman with brown hair -->
+                                <img src="https://pixabay.com/get/g8af9fa2290a1f194db2ce13dc35fd33c289d685609b118d1213e74bfb6c7a726a148f4607253eba85472cea4a03060063f5d77f85c5aff8d214af8d370c0fedf_1280.jpg" alt="Sarah Chen" class="w-8 h-8 rounded-full object-cover"/>
+                                <div>
+                                    <p class="font-medium text-white text-sm">Sarah Chen</p>
+                                    <p class="text-xs text-gray-400">2 mutual friends</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-2">
+                                <button class="flex-1 bg-streamseen-600 hover:bg-streamseen-700 text-white px-2 py-1 rounded text-xs font-medium transition-colors">Accept</button>
+                                <button class="flex-1 bg-gray-600 hover:bg-gray-500 text-white px-2 py-1 rounded text-xs font-medium transition-colors">Decline</button>
+                            </div>
+                        </div>
+                        <div class="p-3 bg-gray-700 rounded-lg">
+                            <div class="flex items-center gap-3 mb-2">
+                                <!-- Sample profile image showing a man with glasses and beard -->
+                                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=32&h=32" alt="Mike Johnson" class="w-8 h-8 rounded-full object-cover"/>
+                                <div>
+                                    <p class="font-medium text-white text-sm">Mike Johnson</p>
+                                    <p class="text-xs text-gray-400">1 mutual friend</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-2">
+                                <button class="flex-1 bg-streamseen-600 hover:bg-streamseen-700 text-white px-2 py-1 rounded text-xs font-medium transition-colors">Accept</button>
+                                <button class="flex-1 bg-gray-600 hover:bg-gray-500 text-white px-2 py-1 rounded text-xs font-medium transition-colors">Decline</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Current Friends -->
+                <div class="bg-gray-800 rounded-xl border border-gray-700 p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-xl font-bold text-white">Friends</h2>
+                        <span class="text-gray-400 text-sm">12</span>
+                    </div>
+                    <div class="space-y-3 max-h-80 overflow-y-auto">
+                        <div class="flex items-center justify-between p-2 hover:bg-gray-700 rounded-lg transition-colors">
+                            <div class="flex items-center gap-3">
+                                <!-- Sample profile image showing a woman with short dark hair -->
+                                <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=32&h=32" alt="Emma Wilson" class="w-8 h-8 rounded-full object-cover"/>
+                                <div>
+                                    <p class="font-medium text-white text-sm">Emma Wilson</p>
+                                    <p class="text-xs text-gray-400">Online now</p>
+                                </div>
+                            </div>
+                            <button class="text-gray-400 hover:text-white text-xs">View</button>
+                        </div>
+                        <div class="flex items-center justify-between p-2 hover:bg-gray-700 rounded-lg transition-colors">
+                            <div class="flex items-center gap-3">
+                                <!-- Sample profile image showing a man with short blonde hair -->
+                                <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=32&h=32" alt="David Kim" class="w-8 h-8 rounded-full object-cover"/>
+                                <div>
+                                    <p class="font-medium text-white text-sm">David Kim</p>
+                                    <p class="text-xs text-gray-400">Active 2h ago</p>
+                                </div>
+                            </div>
+                            <button class="text-gray-400 hover:text-white text-xs">View</button>
+                        </div>
+                        <div class="flex items-center justify-between p-2 hover:bg-gray-700 rounded-lg transition-colors">
+                            <div class="flex items-center gap-3">
+                                <!-- Sample profile image showing a woman with curly hair -->
+                                <img src="https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=32&h=32" alt="Lisa Garcia" class="w-8 h-8 rounded-full object-cover"/>
+                                <div>
+                                    <p class="font-medium text-white text-sm">Lisa Garcia</p>
+                                    <p class="text-xs text-gray-400">Active 1d ago</p>
+                                </div>
+                            </div>
+                            <button class="text-gray-400 hover:text-white text-xs">View</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Friend Activity -->
+                <div class="bg-gray-800 rounded-xl border border-gray-700 p-6">
+                    <h2 class="text-xl font-bold text-white mb-4">Recent Activity</h2>
+                    <div class="space-y-3">
+                        <div class="p-3 bg-gray-700 rounded-lg">
+                            <div class="flex items-start gap-2">
+                                <!-- Sample profile image showing a woman with short dark hair -->
+                                <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=24&h=24" alt="Emma Wilson" class="w-6 h-6 rounded-full object-cover"/>
+                                <div class="min-w-0 flex-1">
+                                    <p class="text-xs text-gray-300">
+                                        <span class="font-medium text-white">Emma</span> rated 
+                                        <span class="text-streamseen-400">The Matrix</span> 5⭐
+                                    </p>
+                                    <p class="text-xs text-gray-500">2h ago</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-3 bg-gray-700 rounded-lg">
+                            <div class="flex items-start gap-2">
+                                <!-- Sample profile image showing a man with short blonde hair -->
+                                <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=24&h=24" alt="David Kim" class="w-6 h-6 rounded-full object-cover"/>
+                                <div class="min-w-0 flex-1">
+                                    <p class="text-xs text-gray-300">
+                                        <span class="font-medium text-white">David</span> added 
+                                        <span class="text-streamseen-400">Dune: Part Two</span>
+                                    </p>
+                                    <p class="text-xs text-gray-500">4h ago</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FRIEND DISCOVERY STATE -->
+    <div id="discovery-state" class="hidden min-h-screen bg-gray-900">
+        <div class="max-w-4xl mx-auto px-4 py-8">
+            <div class="mb-8">
+                <h1 class="text-3xl font-bold text-white">Discover Friends</h1>
+                <p class="text-gray-400 mt-2">Find people with similar taste in movies and shows</p>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="bg-gray-800 rounded-xl border border-gray-700 p-6 mb-6">
+                <div class="flex gap-4">
+                    <input type="text" placeholder="Search by username or email..." class="flex-1 px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-streamseen-500 focus:border-transparent">
+                    <button class="bg-streamseen-600 hover:bg-streamseen-700 text-white px-6 py-2 rounded-lg font-medium transition-colors">Search</button>
+                </div>
+            </div>
+
+            <!-- Suggested Friends -->
+            <div class="bg-gray-800 rounded-xl border border-gray-700 p-6">
+                <h2 class="text-xl font-bold text-white mb-6">Suggested Friends</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-gray-700 rounded-lg p-4">
+                        <div class="flex items-start gap-4">
+                            <!-- Sample profile image showing a young woman with brown hair -->
+                            <img src="https://pixabay.com/get/g8af9fa2290a1f194db2ce13dc35fd33c289d685609b118d1213e74bfb6c7a726a148f4607253eba85472cea4a03060063f5d77f85c5aff8d214af8d370c0fedf_1280.jpg" alt="Sarah Chen" class="w-16 h-16 rounded-xl object-cover"/>
+                            <div class="flex-1 min-w-0">
+                                <h3 class="font-bold text-white">Sarah Chen</h3>
+                                <p class="text-sm text-gray-400">@sarahchen</p>
+                                <p class="text-xs text-gray-500 mt-1">2 mutual friends</p>
+                                <div class="flex items-center gap-2 mt-2">
+                                    <span class="text-xs bg-gray-600 text-gray-300 px-2 py-1 rounded">Sci-Fi</span>
+                                    <span class="text-xs bg-gray-600 text-gray-300 px-2 py-1 rounded">Thriller</span>
+                                </div>
+                                <button class="mt-3 w-full bg-streamseen-600 hover:bg-streamseen-700 text-white px-3 py-1 rounded text-sm font-medium transition-colors">Send Request</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gray-700 rounded-lg p-4">
+                        <div class="flex items-start gap-4">
+                            <!-- Sample profile image showing a man with glasses and beard -->
+                            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=64&h=64" alt="Mike Johnson" class="w-16 h-16 rounded-xl object-cover"/>
+                            <div class="flex-1 min-w-0">
+                                <h3 class="font-bold text-white">Mike Johnson</h3>
+                                <p class="text-sm text-gray-400">@mikejohnson</p>
+                                <p class="text-xs text-gray-500 mt-1">1 mutual friend</p>
+                                <div class="flex items-center gap-2 mt-2">
+                                    <span class="text-xs bg-gray-600 text-gray-300 px-2 py-1 rounded">Comedy</span>
+                                    <span class="text-xs bg-gray-600 text-gray-300 px-2 py-1 rounded">Drama</span>
+                                </div>
+                                <button class="mt-3 w-full bg-streamseen-600 hover:bg-streamseen-700 text-white px-3 py-1 rounded text-sm font-medium transition-colors">Send Request</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gray-700 rounded-lg p-4">
+                        <div class="flex items-start gap-4">
+                            <!-- Sample profile image showing a woman with long dark hair -->
+                            <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=64&h=64" alt="Jennifer Martinez" class="w-16 h-16 rounded-xl object-cover"/>
+                            <div class="flex-1 min-w-0">
+                                <h3 class="font-bold text-white">Jennifer Martinez</h3>
+                                <p class="text-sm text-gray-400">@jenmartinez</p>
+                                <p class="text-xs text-gray-500 mt-1">Similar taste match: 89%</p>
+                                <div class="flex items-center gap-2 mt-2">
+                                    <span class="text-xs bg-gray-600 text-gray-300 px-2 py-1 rounded">Horror</span>
+                                    <span class="text-xs bg-gray-600 text-gray-300 px-2 py-1 rounded">Fantasy</span>
+                                </div>
+                                <button class="mt-3 w-full bg-streamseen-600 hover:bg-streamseen-700 text-white px-3 py-1 rounded text-sm font-medium transition-colors">Send Request</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gray-700 rounded-lg p-4">
+                        <div class="flex items-start gap-4">
+                            <!-- Sample profile image showing a man with short hair and glasses -->
+                            <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=64&h=64" alt="Robert Taylor" class="w-16 h-16 rounded-xl object-cover"/>
+                            <div class="flex-1 min-w-0">
+                                <h3 class="font-bold text-white">Robert Taylor</h3>
+                                <p class="text-sm text-gray-400">@robtaylor</p>
+                                <p class="text-xs text-gray-500 mt-1">3 mutual friends</p>
+                                <div class="flex items-center gap-2 mt-2">
+                                    <span class="text-xs bg-gray-600 text-gray-300 px-2 py-1 rounded">Action</span>
+                                    <span class="text-xs bg-gray-600 text-gray-300 px-2 py-1 rounded">Adventure</span>
+                                </div>
+                                <button class="mt-3 w-full bg-streamseen-600 hover:bg-streamseen-700 text-white px-3 py-1 rounded text-sm font-medium transition-colors">Send Request</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PRIVACY SETTINGS STATE -->
+    <div id="settings-state" class="hidden min-h-screen bg-gray-900">
+        <div class="max-w-3xl mx-auto px-4 py-8">
+            <div class="mb-8">
+                <h1 class="text-3xl font-bold text-white">Privacy Settings</h1>
+                <p class="text-gray-400 mt-2">Control who can see your activity and watchlists</p>
+            </div>
+
+            <!-- Privacy Settings -->
+            <div class="space-y-6">
+                <!-- Profile Visibility -->
+                <div class="bg-gray-800 rounded-xl border border-gray-700 p-6">
+                    <h2 class="text-xl font-bold text-white mb-4">Profile Visibility</h2>
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="font-medium text-white">Public Profile</p>
+                                <p class="text-sm text-gray-400">Allow others to find and view your profile</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" checked class="sr-only peer">
+                                <div class="w-11 h-6 bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-streamseen-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-streamseen-600"></div>
+                            </label>
+                        </div>
+                        
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="font-medium text-white">Show Real Name</p>
+                                <p class="text-sm text-gray-400">Display your real name on your profile</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" checked class="sr-only peer">
+                                <div class="w-11 h-6 bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-streamseen-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-streamseen-600"></div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Watchlist Privacy -->
+                <div class="bg-gray-800 rounded-xl border border-gray-700 p-6">
+                    <h2 class="text-xl font-bold text-white mb-4">Watchlist Privacy</h2>
+                    <div class="space-y-4">
+                        <div>
+                            <p class="font-medium text-white mb-2">Who can see your watchlist?</p>
+                            <div class="space-y-2">
+                                <label class="flex items-center">
+                                    <input type="radio" name="watchlist_privacy" value="public" class="text-streamseen-600 bg-gray-700 border-gray-600 focus:ring-streamseen-500">
+                                    <span class="ml-2 text-gray-300">Everyone</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="radio" name="watchlist_privacy" value="friends" checked class="text-streamseen-600 bg-gray-700 border-gray-600 focus:ring-streamseen-500">
+                                    <span class="ml-2 text-gray-300">Friends only</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="radio" name="watchlist_privacy" value="private" class="text-streamseen-600 bg-gray-700 border-gray-600 focus:ring-streamseen-500">
+                                    <span class="ml-2 text-gray-300">Only me</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <p class="font-medium text-white mb-2">Who can see your ratings and reviews?</p>
+                            <div class="space-y-2">
+                                <label class="flex items-center">
+                                    <input type="radio" name="ratings_privacy" value="public" class="text-streamseen-600 bg-gray-700 border-gray-600 focus:ring-streamseen-500">
+                                    <span class="ml-2 text-gray-300">Everyone</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="radio" name="ratings_privacy" value="friends" checked class="text-streamseen-600 bg-gray-700 border-gray-600 focus:ring-streamseen-500">
+                                    <span class="ml-2 text-gray-300">Friends only</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="radio" name="ratings_privacy" value="private" class="text-streamseen-600 bg-gray-700 border-gray-600 focus:ring-streamseen-500">
+                                    <span class="ml-2 text-gray-300">Only me</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Activity Settings -->
+                <div class="bg-gray-800 rounded-xl border border-gray-700 p-6">
+                    <h2 class="text-xl font-bold text-white mb-4">Activity Settings</h2>
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="font-medium text-white">Share watching activity</p>
+                                <p class="text-sm text-gray-400">Let friends see what you're currently watching</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" checked class="sr-only peer">
+                                <div class="w-11 h-6 bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-streamseen-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-streamseen-600"></div>
+                            </label>
+                        </div>
+                        
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="font-medium text-white">Email notifications</p>
+                                <p class="text-sm text-gray-400">Receive updates about friend activity</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" class="sr-only peer">
+                                <div class="w-11 h-6 bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-streamseen-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-streamseen-600"></div>
+                            </label>
+                        </div>
+
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="font-medium text-white">Friend recommendations</p>
+                                <p class="text-sm text-gray-400">Allow us to suggest friends based on your activity</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" checked class="sr-only peer">
+                                <div class="w-11 h-6 bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-streamseen-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-streamseen-600"></div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Data Management -->
+                <div class="bg-gray-800 rounded-xl border border-gray-700 p-6">
+                    <h2 class="text-xl font-bold text-white mb-4">Data Management</h2>
+                    <div class="space-y-4">
+                        <button class="w-full bg-gray-700 hover:bg-gray-600 text-white py-3 px-4 rounded-lg text-left transition-colors">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="font-medium">Export my data</p>
+                                    <p class="text-sm text-gray-400">Download all your watchlist and activity data</p>
+                                </div>
+                                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                </svg>
+                            </div>
+                        </button>
+                        
+                        <button class="w-full bg-red-900 hover:bg-red-800 text-white py-3 px-4 rounded-lg text-left transition-colors">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="font-medium">Delete my account</p>
+                                    <p class="text-sm text-red-300">Permanently remove your account and all data</p>
+                                </div>
+                                <svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                </svg>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Save Button -->
+                <div class="flex justify-end">
+                    <button class="bg-streamseen-600 hover:bg-streamseen-700 text-white px-6 py-3 rounded-lg font-medium transition-colors">
+                        Save Settings
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // State management for demo
+            const stateSelect = document.getElementById('stateSelect');
+            const states = ['dashboard', 'login', 'profile', 'friends', 'discovery', 'settings'];
+            
+            function showState(stateName) {
+                states.forEach(state => {
+                    const element = document.getElementById(state + '-state');
+                    if (element) {
+                        element.classList.toggle('hidden', state !== stateName);
+                    }
+                });
+            }
+            
+            stateSelect.addEventListener('change', function() {
+                showState(this.value);
+            });
+            
+            // Initialize with dashboard
+            showState('dashboard');
+
+            // TODO: Implement business logic, API calls, or state management
+            // TODO: Add real authentication integration
+            // TODO: Implement database connections
+            // TODO: Add friend request functionality
+            // TODO: Implement privacy controls
+            // TODO: Add real-time notifications
+        })();
+    </script>
+</body>
+</html>
